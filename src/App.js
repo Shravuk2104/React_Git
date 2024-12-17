@@ -1,23 +1,35 @@
-import logo from './logo.svg';
-import './App.css';
+import React,{ useState } from 'react';
+import axios from 'axios';
+import './App.css'
+import SearchForm from './components/SearchForm';
+import GithubCard from './components/GithubCard';
 
 function App() {
+  const [user,setUser] = useState(null);
+  const [loading,setLoading] = useState(false);
+  const [error,setError] = useState('');
+
+  const fetchUserData = async (username) => {
+    setLoading(true);
+    setError('');
+    try{
+      const response = await axios.get(`https://api.github.com/users/${username}`);
+      setUser(response.data);
+    }
+    catch(err){
+      setError('User not found!');
+    }
+    setLoading(false);
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className='App'>
+      <h1> Github Card List App</h1>
+      <SearchForm onSearch={fetchUserData}/>
+      {loading && <p> Loading</p>}
+      {error && <p> {error}</p>}
+
+      {user && <GithubCard user={user}/>}
     </div>
   );
 }
